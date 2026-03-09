@@ -16,10 +16,8 @@ COPY ./conf/server.conf /etc/nginx/conf.d/
 RUN chmod 755 /var/www/html
 
 # nginx uses this user
-RUN chown -R www-data:www-data /var/www/html 
-
-RUN rm -rf /var/www/html/* 
+RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
 EXPOSE 443
 
-# ENTRYPOINT ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
