@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  mariadb:
+    # Common elements
+    build: ./requirements/mariadb
+    container_name: mariadb
+    networks: ['inception']
+    restart: always
+    # Common elements
+    env_file: .env
+    volumes: ['db_data:/var/lib/mysql']
+  
+  wordpress:
+    # Common elements
+    build: ./requirements/wordpress
+    container_name: wordpress
+    networks: ['inception']
+    restart: always
+    # Common elements
+    env_file: .env
+    depends_on: ['mariadb']
+    volumes: ['wp-data:/var/www/html']
+  
+  nginx:
+    # Common elements
+    build: ./requirements/nginx
+    container_name: nginx
+    networks: ['inception']
+    restart: always
+    # Common elements
+    ports: ["443:443"]
+    depends_on: ['wordpress']
+
+networks:
+  inception:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/aelsayed/data/db_data
+  wp_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/aelsayed/data/wp_data
