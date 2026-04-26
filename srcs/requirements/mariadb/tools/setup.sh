@@ -1,23 +1,21 @@
 #!/bin/bash
-set -e
+service mariadb start
 
-# Start MariaDB in the background temporarily
-mysqld --skip-networking &
-
-# Wait for MariaDB to be ready
+# Wait for MariaDB to be ready (The "Health Check")
 until mysqladmin ping >/dev/null 2>&1; do
-    sleep 1
+    sleep 3
 done
 
-# Create database and users from environment variables
-mysql <<-EOSQL
-    CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
-    CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-    GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
-    FLUSH PRIVILEGES;
-EOSQL
+# If the database directory doesn't exist, create it
+if [ ! -d "/var/lib/mysql/${SQL_DATABASE}" ]; then
+    mysql -e "CREATE DATABASE IF NOT EXISTS \`${SQL_DATABASE}\`;"
+    mysql -e "CREATE USER IF NOT EXISTS \`${SQL_USER}\`@'%' IDENTIFIED BY '${SQL_PASSWORD}';"
+    mysql -e "GRANT ALL PRIVILEGES ON \`${SQL_DATABASE}\`.* TO \`${SQL_USER}\`@'%';"
+    mysql -e "FLUSH PRIVILEGES;"
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${SQL_ROOT_PASSWORD}';"
+fi
 
-mysqladmin shutdown
+mysqladmin -u root -p$SQL_ROOT_PASSWORD shutdown
 
-# Start mysqld in foreground (PID 1)
+# Start in foreground
 exec mysqld

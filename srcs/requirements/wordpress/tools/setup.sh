@@ -1,42 +1,32 @@
 #!/bin/bash
-set -e
 
-WP_PATH="/var/www/html"
-CONFIG_FILE="$WP_PATH/wp-config.php"
+# 1. Wait for the database to be ready
+sleep 7
 
-# Wait for MariaDB to be ready
-sleep 10
+# 2. Download and extract WordPress if not already there
+if [ ! -f "wp-config.php" ]; then
+    curl -O https://wordpress.org/latest.tar.gz
+    tar -xvf latest.tar.gz --strip-components=1
+    rm latest.tar.gz
 
-# Only create wp-config.php if it doesn't exist
-if [ ! -f "$CONFIG_FILE" ]; then
-    cp "$WP_PATH/wp-config-sample.php" "$CONFIG_FILE"
+    # 3. Create wp-config from the sample
+    cp wp-config-sample.php wp-config.php
 
-    # Replace DB credentials with env variables
-    sed -i "s/database_name_here/${MYSQL_DATABASE}/" "$CONFIG_FILE"
-    sed -i "s/username_here/${MYSQL_USER}/" "$CONFIG_FILE"
-    sed -i "s/password_here/${MYSQL_PASSWORD}/" "$CONFIG_FILE"
-    sed -i "s/localhost/${MYSQL_HOST}/" "$CONFIG_FILE"
+    # 4. Use 'sed' to inject your environment variables
+    # We use 'i' for in-place editing
+    sed -i "s/database_name_here/$SQL_DATABASE/g" wp-config.php
+    sed -i "s/username_here/$SQL_USER/g" wp-config.php
+    sed -i "s/password_here/$SQL_PASSWORD/g" wp-config.php
+    sed -i "s/localhost/mariadb/g" wp-config.php
 
-    # Append dynamically generated salts
-    SALTS=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)
-    # Replace placeholder define() lines
-    sed -i "/AUTH_KEY/d" "$CONFIG_FILE"
-    sed -i "/SECURE_AUTH_KEY/d" "$CONFIG_FILE"
-    sed -i "/LOGGED_IN_KEY/d" "$CONFIG_FILE"
-    sed -i "/NONCE_KEY/d" "$CONFIG_FILE"
-    sed -i "/AUTH_SALT/d" "$CONFIG_FILE"
-    sed -i "/SECURE_AUTH_SALT/d" "$CONFIG_FILE"
-    sed -i "/LOGGED_IN_SALT/d" "$CONFIG_FILE"
-    sed -i "/NONCE_SALT/d" "$CONFIG_FILE"
-
-    # Insert salts after the DB settings
-    sed -i "/^define('DB_COLLATE'/a $SALTS" "$CONFIG_FILE"
-
-    echo "wp-config.php created successfully!"
+    # we add redis conf here
 fi
 
-# Ensure PHP-FPM has its runtime folder
+# 5. Fix permissions so NGINX and PHP can read/write files
+chown -R www-data:www-data /var/www/wordpress
+
+# 6. Create the run directory for PHP-FPM
 mkdir -p /run/php
 
-# Start PHP-FPM in foreground
-exec php-fpm8.2 -F
+# 7. Start PHP-FPM in foreground
+exec /usr/sbin/php-fpm7.4 -F
