@@ -1,53 +1,47 @@
-version: '3.9'
-
 services:
   mariadb:
-    # Common elements
     container_name: mariadb
     build: ./requirements/mariadb
     networks: ['inception']
     restart: always
-    # Common elements
     env_file: .env
-    volumes: ['db_data:/var/lib/mysql']
+    volumes: ['mariadb_data:/var/lib/mysql']
   
   wordpress:
-    # Common elements
     container_name: wordpress
     build: ./requirements/wordpress
     networks: ['inception']
     restart: always
-    # Common elements
     env_file: .env
     depends_on: ['mariadb']
-    volumes: ['wp-data:/var/www/html']
+    volumes: ['wordpress_data:/var/www/wordpress']
   
   nginx:
-    # Common elements
     container_name: nginx
     build: ./requirements/nginx
     networks: ['inception']
     restart: always
-    # Common elements
     ports: ["443:443"]
     depends_on: ['wordpress']
+    volumes: ['wordpress_data:/var/www/wordpress']
 
 networks:
   inception:
     driver: bridge
 
 #volumes allow to store in a persistent disk the content in a local disk
-#db_data is a volume created by docker directly
+#mariadb_data is a volume created by docker directly
+
 volumes:
-  db_data:
+  mariadb_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/aelsayed/data/db_data
-  wp_data:
+      device: /home/aelsayed/data/mariadb
+  wordpress_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/aelsayed/data/wp_data
+      device: /home/aelsayed/data/wordpress
