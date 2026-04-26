@@ -1,4 +1,6 @@
 #!/bin/bash
+set -x
+cd /var/www/wordpress
 
 # 1. Wait for the database to be ready
 sleep 7
@@ -14,9 +16,9 @@ if [ ! -f "wp-config.php" ]; then
 
     # 4. Use 'sed' to inject your environment variables
     # We use 'i' for in-place editing
-    sed -i "s/database_name_here/$SQL_DATABASE/g" wp-config.php
-    sed -i "s/username_here/$SQL_USER/g" wp-config.php
-    sed -i "s/password_here/$SQL_PASSWORD/g" wp-config.php
+    sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config.php
+    sed -i "s/username_here/$MYSQL_USER/g" wp-config.php
+    sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config.php
     sed -i "s/localhost/mariadb/g" wp-config.php
 
     # we add redis conf here
@@ -29,4 +31,4 @@ chown -R www-data:www-data /var/www/wordpress
 mkdir -p /run/php
 
 # 7. Start PHP-FPM in foreground
-exec /usr/sbin/php-fpm7.4 -F
+exec /usr/sbin/php-fpm8.2 -F
