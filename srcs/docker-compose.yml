@@ -1,47 +1,73 @@
 services:
-  mariadb:
-    container_name: mariadb
-    build: ./requirements/mariadb
-    networks: ['inception']
-    restart: always
-    env_file: .env
-    volumes: ['mariadb_data:/var/lib/mysql']
-  
-  wordpress:
-    container_name: wordpress
-    build: ./requirements/wordpress
-    networks: ['inception']
-    restart: always
-    env_file: .env
-    depends_on: ['mariadb']
-    volumes: ['wordpress_data:/var/www/wordpress']
-  
+  # Mandatory
   nginx:
-    container_name: nginx
     build: ./requirements/nginx
-    networks: ['inception']
-    restart: always
+    container_name: nginx
+    volumes: [nginx_data:/var/www/wordpress]
     ports: ["443:443"]
-    depends_on: ['wordpress']
-    volumes: ['wordpress_data:/var/www/wordpress']
+    depends_on: [wordpress]
+    restart: always
+    networks: [inception]
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    volumes: [mariadb_data:/var/lib/mysql]
+    env_file: [.env]
+    restart: always
+    networks: [inception]
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    volumes: [nginx_data:/var/www/wordpress]
+    ports: ["9000:9000"]
+    depends_on: [mariadb]
+    env_file: [.env]
+    restart: always
+    networks: [inception]
+  # Bonus
+  adminer:
+    build: ./bonus/adminer
+    container_name: adminer
+    restart: unless-stopped
+    networks: [inception]
+    depends_on: [mariadb]
+  redis:
+    build: ./bonus/redis
+    container_name: redis
+    restart: unless-stopped
+    networks: [inception]
+    depends_on: [wordpress]
+  webserv:
+    build: ./bonus/webserv
+    container_name: webserv
+    volumes: ['webserv:/webserv']
+    restart: unless-stopped
+    networks: [inception]
+
 
 networks:
   inception:
     driver: bridge
 
-#volumes allow to store in a persistent disk the content in a local disk
-#mariadb_data is a volume created by docker directly
-
 volumes:
+  nginx_data:
+    name: nginx_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/$USER/data/nginx
+      o: bind
   mariadb_data:
+    name: mariadb_volume
     driver: local
     driver_opts:
       type: none
+      device: /home/$USER/data/mariadb
       o: bind
-      device: /home/sayed/data/mariadb
-  wordpress_data:
+  webserv:
+    name: webserv_volume
     driver: local
     driver_opts:
-      type: none
-      o: bind
-      device: /home/sayed/data/wordpress
+      type: 'none'
+      o: 'bind'
+      device: '/home/$USER/data/webserv'

@@ -1,34 +1,54 @@
-#!/bin/bash
-set -x
-cd /var/www/wordpress
+#!/bin/sh
 
-# 1. Wait for the database to be ready
-sleep 7
+# 1. Wait for MariaDB to be fully ready
+while ! mysqladmin ping -h"$DB_HOST" --silent; do
+    echo "waiting for mysql ..."
+    sleep 2
+done
 
-# 2. Download and extract WordPress if not already there
+# Check if WordPress is already installed to prevent re-running
 if [ ! -f "wp-config.php" ]; then
-    curl -O https://wordpress.org/latest.tar.gz
-    tar -xvf latest.tar.gz --strip-components=1
-    rm latest.tar.gz
 
-    # 3. Create wp-config from the sample
-    cp wp-config-sample.php wp-config.php
+    echo "Downloading WordPress..."
+    wp core download --allow-root
 
-    # 4. Use 'sed' to inject your environment variables
-    # We use 'i' for in-place editing
-    sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config.php
-    sed -i "s/username_here/$MYSQL_USER/g" wp-config.php
-    sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config.php
-    sed -i "s/localhost/mariadb/g" wp-config.php
+    # 2. CREATE the wp-config.php file FIRST
+    echo "Creating wp-config.php..."
+    wp config create --allow-root \
+        --dbname="$MYSQL_DATABASE" \
+        --dbuser="$MYSQL_USER" \
+        --dbpass="$MYSQL_PASSWORD" \
+        --dbhost="$DB_HOST" 
 
-    # we add redis conf here
+    # 3. NOW set the Redis configurations inside the newly created file
+    echo "Configuring Redis cache settings..."
+    wp config set WP_CACHE true --raw --allow-root
+    wp config set WP_REDIS_HOST redis --allow-root
+    wp config set WP_REDIS_PORT 6379 --raw --allow-root
+
+    # 4. Install WordPress tables
+    echo "Installing WordPress..."
+    wp core install --allow-root \
+        --url="$WP_DOMAIN" \
+        --title="$WP_TITLE" \
+        --admin_user="$WP_ADMIN_USER" \
+        --admin_password="$WP_ADMIN_PASS" \
+        --admin_email="$WP_ADMIN_EMAIL"
+
+    # 5. Create your secondary user
+    echo "Creating second user..."
+    wp user create "$WP_USER" "$WP_EMAIL" \
+        --user_pass="$USER_PASSWORD" \
+        --allow-root
+
+    # 6. Install and activate the caching engine
+    echo "Installing and activating Redis Cache plugin..."
+    wp plugin install redis-cache --activate --allow-root
+    wp redis enable --allow-root
+
+else
+    echo "WordPress configuration already exists. Skipping setup routines."
 fi
 
-# 5. Fix permissions so NGINX and PHP can read/write files
-chown -R www-data:www-data /var/www/wordpress
-
-# 6. Create the run directory for PHP-FPM
-mkdir -p /run/php
-
-# 7. Start PHP-FPM in foreground
-exec /usr/sbin/php-fpm8.2 -F
+echo "Starting PHP-FPM..."
+exec php-fpm8.2 -F
