@@ -13,7 +13,7 @@ The entire cluster is orchestrated via a single unified `docker-compose.yml` fil
 - **vsftpd (FTP Server)**: A secure file transfer channel configured with a chroot jail to access the shared WordPress volume.
 - **Redis**: An in-memory database configuration acting as an object cache to optimize database query overhead.
 - **Adminer**: A lightweight, single-file database management utility.
-**Webserv (Bonus Static Website)**: A custom HTTP web server implemented completely from scratch by `gnxrlyqf` and me in C++ 98. It acts as a live production test for the `webserv` engine, securely hosting and serving my personal portfolio page under a dedicated NGINX reverse-proxy route.
+- **Webserv (Bonus Static Website)**: A custom HTTP web server implemented completely from scratch by `gnxrlyqf` and me in C++ 98. It acts as a live production test for the `webserv` engine, securely hosting and serving my personal portfolio page under a dedicated NGINX reverse-proxy route.
 - **Code Playground**: A custom-designed Flask web application providing an isolated code execution environment to run Python and Bash scripts natively inside the container matrix.
 
 ---

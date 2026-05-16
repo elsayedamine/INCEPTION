@@ -19,16 +19,13 @@ To intercept regional domain calls locally, append this mapping route directly i
 ```
 
 ### 3. Creating Environment Configurations
-The infrastructure relies on local environment variables to establish network parameters. Create an uncommitted file named .env in the root project folder populated with these explicit key mappings:
+The infrastructure relies on local environment variables to establish network parameters. Update the non-complete file named .env in the root project folder and populate these variables.
 
 ```bash
-DOMAIN_NAME=aelsayed.42.fr
-SQL_DATABASE=inception_db
-SQL_USER=wp_user
-SQL_PASSWORD=secure_password
-SQL_ROOT_PASSWORD=root_password
-FTP_USER=ftpadmin
-FTP_PASSWORD=ftp_password
+MYSQL_PASSWORD=secure_password
+WP_ADMIN_PASS=secure_password
+USER_PASSWORD=secure_password
+FTP_PASS=secure_password
 ```
 
 ## 🏗️ Orchestration and Build Commands

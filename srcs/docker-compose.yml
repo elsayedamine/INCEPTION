@@ -39,7 +39,7 @@ services:
   webserv:
     build: ./bonus/webserv
     container_name: webserv
-    volumes: ['webserv:/webserv']
+    volumes: ['webserv_data:/webserv']
     restart: unless-stopped
     networks: [inception]
   ftp:
@@ -81,7 +81,7 @@ volumes:
       type: none
       device: /home/$USER/data/mariadb
       o: bind
-  webserv:
+  webserv_data:
     name: webserv_volume
     driver: local
     driver_opts:

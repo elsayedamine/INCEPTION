@@ -24,13 +24,13 @@ All infrastructure lifecycle commands must be executed from the root of the repo
 **To Start the Infrastructure:**
 ```bash
     make up
-    \# This command reads the configuration layer, builds the containers, creates the private network, and launches all services cleanly in the background.
+    # This command reads the configuration layer, builds the containers, creates the private network, and launches all services cleanly in the background.
 ```
 
 **To Stop the Infrastructure:**
 ```bash
     make down
-    \# This safely ceases all running app processes without harming your persistent media assets or data collections.
+    # This safely ceases all running app processes without harming your persistent media assets or data collections.
 ```
 
 ---
