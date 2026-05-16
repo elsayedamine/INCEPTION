@@ -4,6 +4,7 @@ all: setup up
 setup:
 	@mkdir -p /home/$(USER)/data/nginx
 	@mkdir -p /home/$(USER)/data/mariadb
+	@sudo rm -rf /home/$(USER)/data/websesrv
 	@echo "Directories created successfully."
 
 up:
@@ -24,8 +25,5 @@ fclean: clean
 	@echo "All data directories removed."
 
 rebuild: fclean all
-
-setup_bonus:
-	@mkdir -p /home/$(USER)/data/webserv
 
 re:clean up

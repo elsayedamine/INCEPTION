@@ -1,18 +1,16 @@
 FROM debian:12
 
-RUN apt-get update && apt-get install -y \
-    vsftpd \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install vsftpd -y && rm -rf /var/lib/apt/lists/*
 
-# Create the mandatory secure empty directory vsftpd requires to boot
-RUN mkdir -p /var/run/vsftpd/empty
+# Correct path for vsftpd secure chroot directory on Debian
+RUN mkdir -p /var/run/vsftpd/empty && chmod 755 /var/run/vsftpd/empty
 
-COPY conf/vsftpd.conf /etc/vsftpd.conf
+# Pull variables from compose environment definitions
+ARG FTP_USER FTP_PASS
+ENV FTP_USER=$FTP_USER FTP_PASS=$FTP_PASS
+
 COPY tools/setup.sh /usr/local/bin/setup.sh
-
 RUN chmod +x /usr/local/bin/setup.sh
 
-# Expose FTP control port (21) and the passive data port spectrum (40000-40005)
-EXPOSE 21 40000-40005
-
-ENTRYPOINT ["sh", "/usr/local/bin/setup.sh"]
+# Run the script WHEN THE CONTAINER STARTS, not when it builds
+ENTRYPOINT [ "/usr/local/bin/setup.sh" ]

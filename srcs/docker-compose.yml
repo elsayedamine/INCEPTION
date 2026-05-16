@@ -48,10 +48,19 @@ services:
     build: ./bonus/ftp
     restart: always
     env_file: [.env]
+    environment:
+      - FTP_USER=${FTP_USER}
+      - FTP_PASS=${FTP_PASS}
     ports: ["21:21", "40000-40005:40000-40005"]
     volumes: [nginx_data:/var/www/wordpress]
     networks: [inception]
     depends_on: [wordpress]
+  playground:
+    build: ./bonus/playground
+    container_name: playground
+    restart: unless-stopped
+    volumes: [/var/run/docker.sock:/var/run/docker.sock]
+    networks: [inception]
 
 
 networks:
