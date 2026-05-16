@@ -32,16 +32,20 @@ FTP_PASSWORD=ftp_password
 ```
 
 ## 🏗️ Orchestration and Build Commands
-The root project contains a specialized Makefile designed to encapsulate Docker Compose workflows into clean commands.
+
+The root project contains a specialized `Makefile` designed to encapsulate Docker Compose workflows into clean commands.
 
 ```bash
+make all      # Runs the environment setup and launches the infrastructure.
+make setup    # Creates the mandatory persistent data storage paths on the host.
 make up       # Compiles custom Dockerfiles, configures networks, and detaches containers.
+make build    # Forces a complete container rebuild from scratch without using cached layers.
 make down     # Halts service run states safely without altering system volume layers.
-make stop     # Pauses the active runtime execution loop of the containers.
-make start    # Resumes a previously paused container runtime sequence.
-make clean    # Destroys active container environments and private virtual network frameworks.
-make fclean   # Performs a deep wipe: clears containers, networks, and deletes all persistent data disks.
-make re       # Forces a complete scratch recompilation and initialization sequence.
+make restart  # Restarts all containerized services within the stack.
+make clean    # Destroys the container environment and purges associated virtual volumes.
+make fclean   # Executes a full system wipe, tearing down containers and deleting host data directories.
+make rebuild  # Performs a deep purge of everything before rebuilding and restarting from scratch.
+make re       # Cleans up the container layers and spins the infrastructure back up.
 ```
 
 ## 💾 Storage Layout and Data Persistence
