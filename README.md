@@ -13,6 +13,7 @@ The entire cluster is orchestrated via a single unified `docker-compose.yml` fil
 - **vsftpd (FTP Server)**: A secure file transfer channel configured with a chroot jail to access the shared WordPress volume.
 - **Redis**: An in-memory database configuration acting as an object cache to optimize database query overhead.
 - **Adminer**: A lightweight, single-file database management utility.
+**Webserv (Bonus Static Website)**: A custom HTTP web server implemented completely from scratch by `gnxrlyqf` and me in C++ 98. It acts as a live production test for the `webserv` engine, securely hosting and serving my personal portfolio page under a dedicated NGINX reverse-proxy route.
 - **Code Playground**: A custom-designed Flask web application providing an isolated code execution environment to run Python and Bash scripts natively inside the container matrix.
 
 ---
@@ -60,13 +61,10 @@ Additionally, ensure your local /etc/hosts file routes domain queries correctly:
 Create a .env file in the root of your project directory populated with your orchestration parameters:
 
 ```bash
-DOMAIN_NAME=aelsayed.42.fr
-SQL_DATABASE=inception_db
-SQL_USER=wp_user
-SQL_PASSWORD=secure_password
-SQL_ROOT_PASSWORD=root_password
-FTP_USER=ftpadmin
-FTP_PASSWORD=ftp_password
+MYSQL_PASSWORD=secure_password
+WP_ADMIN_PASS=secure_password
+USER_PASSWORD=secure_password
+FTP_PASS=secure_password
 ```
 
 ### 3. Compilation & Execution
@@ -101,3 +99,4 @@ Artificial Intelligence was used during the development of this project to assis
 1. **Architectural Ideation & Service Selection**: AI was used to brainstorm and select a clever, independent, and secure custom service for the project's bonus requirements, resulting in the implementation of an isolated code-execution playground container.
 2. **Infrastructure Debugging & Step-by-Step Resolution**: AI assisted in diagnosing system configuration conflicts, tracking down routing bugs (such as pathing errors and internal container failures), and providing commented, step-by-step instructions to ensure correct service orchestration.
 3. **Frontend Interface Engineering**: Assisted in designing and structuring the modern UI for the code playground web application, creating an aesthetically continuous, dark-blue system developer dashboard layout complete with dynamic execution states and custom styling.
+4. **Documentation Polishing & Technical Auditing**: AI was utilized to draft, format, and audit this README.md file. This included polishing the ideas firstly written and ensuring this readme follows the guidelines of the subject concerning readme specifications.
