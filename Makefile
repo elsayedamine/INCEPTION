@@ -4,7 +4,7 @@ all: setup up
 setup:
 	@mkdir -p /home/$(USER)/data/nginx
 	@mkdir -p /home/$(USER)/data/mariadb
-	@sudo rm -rf /home/$(USER)/data/webserv
+	@mkdir -p /home/$(USER)/data/webserv
 	@echo "Directories created successfully."
 
 up:
