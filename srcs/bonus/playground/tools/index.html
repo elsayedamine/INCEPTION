@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Playground</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: #131a26;
+            --border-color: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --terminal-green: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: rgba(0, 0, 0, 0.15);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dot-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background-color: #ef4444; }
+        .dot.yellow { background-color: #f59e0b; }
+        .dot.green { background-color: #10b981; }
+
+        h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        select {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--accent-blue);
+        }
+
+        button {
+            background-color: var(--accent-blue);
+            color: #040811;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .workspace {
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            background-color: transparent;
+            color: #e2e8f0;
+            border: none;
+            padding: 24px;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        .output-panel {
+            background-color: rgba(0, 0, 0, 0.25);
+            border-top: 1px solid var(--border-color);
+            padding: 20px 24px;
+        }
+
+        .output-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        pre {
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: var(--terminal-green);
+            white-space: pre-wrap;
+            word-break: break-all;
+            min-height: 60px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .empty-output {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="title-group">
+            <div class="dot-group">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <h1>PLAYGROUND // EXEC</h1>
+        </div>
+        <div class="controls">
+            <select id="lang" onchange="updatePlaceholder()">
+                <option value="python">Python 3</option>
+                <option value="bash">Bash Script</option>
+            </select>
+            <button id="run-btn" onclick="run()">Run Code</button>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <textarea id="code" spellcheck="false">print("Hello, World!")</textarea>
+        
+        <div class="output-panel">
+            <div class="output-header">Console Output</div>
+            <pre id="out"><span class="empty-output">Program output will appear here...</span></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePlaceholder() {
+        const lang = document.getElementById("lang").value;
+        const codeArea = document.getElementById("code");
+        if (lang === "python") {
+            codeArea.value = 'print("Hello, World!")';
+        } else if (lang === "bash") {
+            codeArea.value = 'echo "Hello, World!"';
+        }
+    }
+
+    async function run() {
+        const runBtn = document.getElementById("run-btn");
+        const outputFrame = document.getElementById("out");
+        
+        runBtn.innerText = "Running...";
+        runBtn.style.opacity = "0.7";
+        runBtn.disabled = true;
+
+        try {
+            const r = await fetch("/playground/run", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    language: document.getElementById("lang").value,
+                    code: document.getElementById("code").value
+                })
+            });
+            
+            if (!r.ok) {
+                throw new Error(`Server returned status ${r.status}`);
+            }
+
+            const data = await r.json();
+            
+            if (data.output && data.output.trim() !== "") {
+                outputFrame.innerText = data.output;
+            } else {
+                outputFrame.innerHTML = '<span class="empty-output">[Process completed with no output returns]</span>';
+            }
+        } catch (err) {
+            outputFrame.innerText = `Execution Error: ${err.message}\nCheck your reverse proxy config settings if this persists.`;
+            outputFrame.style.color = "#ef4444"; // Switch output text to red on crash
+        } finally {
+            runBtn.innerText = "Run Code";
+            runBtn.style.opacity = "1";
+            runBtn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
