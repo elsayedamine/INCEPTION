@@ -19,7 +19,6 @@ services:
     build: ./requirements/wordpress
     container_name: wordpress
     volumes: [nginx_data:/var/www/wordpress]
-    ports: ["9000:9000"]
     depends_on: [mariadb]
     env_file: [.env]
     restart: always
