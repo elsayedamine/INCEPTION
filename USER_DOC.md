@@ -69,13 +69,13 @@ To verify that all application layers are working correctly, run the following s
 1.  **Check Process Running Status:**
 ```bash
     docker compose ps
-    \# Look at the `STATUS` column. Every service should read `Up` or `Running`.
+    # Look at the `STATUS` column. Every service should read `Up` or `Running`.
 ```
 
 ## Inspect Active Performance Logs:
 
 ```Bash
     docker compose logs -f [service_name]
-    \# Replace `[service_name]` with specific instances (e.g., `nginx`, `wordpress`, `playground`)
+    # Replace `[service_name]` with specific instances (e.g., `nginx`, `wordpress`, `playground`)
 ```
 
